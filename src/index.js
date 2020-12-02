@@ -3,6 +3,9 @@ import ReactDOM from 'react-dom';
 import { Formik, Form, useField } from 'formik';
 import * as Yup from 'yup';
 import './index.css';
+/* to integrate with stored procedures */
+//import FetchData from "../utils/FetchData";
+
  
  const MyTextInput = ({ label, ...props }) => {
    // useField() returns [formik.getFieldProps(), formik.getFieldMeta()]
@@ -69,62 +72,89 @@ import './index.css';
    );
  };
 
- const showInfo = () => {
-
-  
- }
- 
  // And now we can use these
- const SignupForm = () => {
-   return (
-     <>
+ class SignupForm extends React.Component {
+   
+  state = { 
+    showE: false,
+    showP: false,
+    showH: false
+  }
+
+  setShowEthnicity = () => {
+    this.setState(prevState => ({
+      showE: !prevState.showE
+    }))
+  }
+
+  setShowPLanguage = () => {
+    this.setState(prevState => ({
+      showP: !prevState.showP
+    }))
+  }
+
+  setShowHLanguage = () => {
+    this.setState(prevState => ({
+      showH: !prevState.showH
+    }))
+  }
+
+  render () {
+      return (
+      <>
        <h1>Minimal Sociodemographic Info</h1>
        <Formik
          initialValues={{
-           firstName: '',
-           lastName: '',
-           acceptedTerms: false, // added for our checkbox
-           racialEthnic: '', // added for our select
+           FirstName: '',
+           LastName: '',
+           //acceptedTerms: false, // added for our checkbox
+           Ethnicity: '', // added for our select
          }}
          validationSchema={Yup.object({
-           firstName: Yup.string()
+           FirstName: Yup.string()
              .max(15, 'Must be 15 characters or less')
              .required('Required'),
-           lastName: Yup.string()
+           LastName: Yup.string()
              .max(20, 'Must be 20 characters or less')
              .required('Required'),
-           gender: Yup.string()
+           Gender: Yup.string()
              .oneOf(
                ['boy', 'girl', 'other'],
                'Invalid selection'
              )
              .required('Required'),
-           school: Yup.string()
+           School: Yup.string()
              .max(100, 'Must be 100 characters or less')
              .required('Required'),
-            grade: Yup.mixed()
+            Grade: Yup.mixed()
              .oneOf(
                ['4', '5', '6', '7', '8', 'other'],
                'Invalid selection'
              )
              .required('Required'),
-            racialEthnic:  Yup.array().of( 
+            Ethnicity:  Yup.array().of( 
               Yup.string().oneOf(
                 ['white', 'black', 'latino', 'asian', 'amerindian', 'pacific', 'other'],
                 'Invalid racial/ethnic selection')
             )
               .required('Please select at least one racial/ethnic background.'),
-            languagesYou:  Yup.array().of( 
+            PrimaryLanguage:  Yup.array().of( 
                 Yup.string().oneOf(
                   ['spanish', 'arabic', 'chinese', 'english', 'other'],
                   'Invalid language selection')
               )
                 .required('Please select at least one language.'),
-
+            languagesHome:  Yup.array().of( 
+                  Yup.string().oneOf(
+                    ['spanish', 'arabic', 'chinese', 'english', 'other'],
+                    'Invalid language selection')
+                )
+                  .required('Please select at least one language.'),
          })}
          onSubmit={(values, { setSubmitting }) => {
            setTimeout(() => {
              alert(JSON.stringify(values, null, 2));
+             //fetchData('/get_Studentinfo/', 'PUT', values)
              setSubmitting(false);
            }, 400);
          }}
@@ -133,7 +163,7 @@ import './index.css';
             <div>
            <MyTextInput
              label="First Name"
-             name="firstName"
+             name="FirstName"
              type="text"
              placeholder="Jane"
            /> 
@@ -141,28 +171,28 @@ import './index.css';
            <div>
            <MyTextInput
              label="Last Name"
-             name="lastName"
+             name="LastName"
              type="text"
              placeholder="Doe"
            />
            </div>
            <div>
            <label>Gender: </label>
-            <MyRadio type="radio" name="gender" value="boy"> Boy </MyRadio>
-            <MyRadio type="radio" name="gender" value="girl"> Girl </MyRadio>
-            <MyRadio type="radio" name="gender" value="other"> Other </MyRadio>
+            <MyRadio type="radio" name="Gender" value="boy"> Boy </MyRadio>
+            <MyRadio type="radio" name="Gender" value="girl"> Girl </MyRadio>
+            <MyRadio type="radio" name="Gender" value="other"> Other </MyRadio>
 
            </div>
            <div>
            <MyTextInput
              label="What is your school's name?"
-             name="school"
+             name="School"
              type="text"
              placeholder=""
            />
            </div>
            <div>
-           <MySelect label="What grade are you in?" name="grade">
+           <MySelect label="What grade are you in?" name="Grade">
              <option value="">Select a grade level</option>
              <option value="4">4</option>
              <option value="5">5</option>
@@ -172,73 +202,85 @@ import './index.css';
              <option value="other">Other</option>
            </MySelect>
            </div>
-           <div style={{ display: showInfo ? "block" : "none" }}> 
-           <MyTextInput
-             label="Other"
-             name="school-other"
-             type="text"
-             placeholder=""
-           />
-           </div>
+           
            <div>
            <MyTextInput
              label="What is the name of your homeroom teacher?"
-             name="teacher"
+             name="HomeroomTeacher"
              type="text"
              placeholder=""
            />
            </div>
-          <div><label htmlFor="racialEthnic">What is your racial/ethnic background (Please check all that apply)?</label>
+          <div><label htmlFor="Ethnicity">What is your racial/ethnic background (Please check all that apply)?</label>
            <MyCheckbox 
             multiple={true} 
             value="white" 
-            name="racialEthnic">White</MyCheckbox>
+            name="Ethnicity">White</MyCheckbox>
            <MyCheckbox multiple={true}
             value="black" 
-            name="racialEthnic">Black or African American
+            name="Ethnicity">Black or African American
             </MyCheckbox>
             <MyCheckbox multiple={true} 
             value="latino" 
-            name="racialEthnic">Hispanic or Latino
+            name="Ethnicity">Hispanic or Latino
             </MyCheckbox>
             <MyCheckbox multiple={true} 
             value="asian" 
-            name="racialEthnic">Asian
+            name="Ethnicity">Asian
             </MyCheckbox>
             <MyCheckbox multiple={true} 
             value="amerindian" 
-            name="racialEthnic">American Indian or Alaska Native
+            name="Ethnicity">American Indian or Alaska Native
             </MyCheckbox>
             <MyCheckbox multiple={true} 
             value="pacific" 
-            name="racialEthnic">Native Hawaiian or Other Pacific Islander
+            name="Ethnicity">Native Hawaiian or Other Pacific Islander
             </MyCheckbox>
             <MyCheckbox multiple={true} 
             value="other" 
-            name="racialEthnic">Other
+            name="Ethnicity"
+            onClick={this.setShowEthnicity}
+            >Other            
             </MyCheckbox>
            </div>
-           <div><label htmlFor="languagesYou">What language or languages do <strong>you</strong> speak at home (Please check all that apply)? </label>
+           <div id="EthnicityOther" style={{ display: this.state.showE ? "block" : "none" }}> 
+           <MyTextInput
+             label="Other"
+             name="EthnicityOther"
+             type="text"
+             placeholder=""
+           />
+           </div>
+           <div><label htmlFor="PrimaryLanguage">What language or languages do <strong>you</strong> speak at home (Please check all that apply)? </label>
            <MyCheckbox 
             multiple={true} 
             value="spanish" 
-            name="languagesYou">Spanish</MyCheckbox>
+            name="PrimaryLanguage">Spanish</MyCheckbox>
            <MyCheckbox multiple={true} 
             value="arabic" 
-            name="languagesYou">Arabic
+            name="PrimaryLanguage">Arabic
             </MyCheckbox>
             <MyCheckbox multiple={true} 
             value="chinese" 
-            name="languagesYou">Chinese
+            name="PrimaryLanguage">Chinese
             </MyCheckbox>
             <MyCheckbox multiple={true} 
             value="english" 
-            name="languagesYou">English
+            name="PrimaryLanguage">English
             </MyCheckbox>
             <MyCheckbox multiple={true} 
             value="other" 
-            name="languagesYou">Other
+            name="PrimaryLanguage"
+            onClick={this.setShowPLanguage} >Other            
             </MyCheckbox>
+           </div>
+           <div style={{ display: this.state.showP ? "block" : "none" }}> 
+           <MyTextInput
+             label="Other"
+             name="OtherLanguageHome"
+             type="text"
+             placeholder=""
+           />
            </div>
            <div><label htmlFor="languagesHome">What language or languages do <strong>people in your home</strong> speak (Please check all that apply)?</label>
            <MyCheckbox 
@@ -259,14 +301,23 @@ import './index.css';
             </MyCheckbox>
             <MyCheckbox multiple={true} 
             value="other" 
-            name="languagesHome">Other
+            name="languagesHome"
+            onClick={this.setShowHLanguage}>Other
             </MyCheckbox>
+           </div>
+           <div style={{ display: this.state.showH ? "block" : "none" }}> 
+           <MyTextInput
+             label="Other"
+             name="OtherLanguagePeople"
+             type="text"
+             placeholder=""
+           />
            </div>
            <button type="submit">Submit</button>
          </Form>
        </Formik>
      </>
    );
- };
-
+ }
+ }
  ReactDOM.render(<SignupForm />, document.getElementById('root'));
