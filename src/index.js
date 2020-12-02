@@ -154,7 +154,7 @@ import './index.css';
          onSubmit={(values, { setSubmitting }) => {
            setTimeout(() => {
              alert(JSON.stringify(values, null, 2));
-             //fetchData('/get_Studentinfo/', 'PUT', values)
+             //fetchData('/get_Studentinfo/', 'PUT', values) /*put data to database; will need to get a unique id for next section */
              setSubmitting(false);
            }, 400);
          }}
@@ -318,6 +318,6 @@ import './index.css';
        </Formik>
      </>
    );
- }
+  }
  }
  ReactDOM.render(<SignupForm />, document.getElementById('root'));
